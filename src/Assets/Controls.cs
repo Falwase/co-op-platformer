@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-
 
 public class Controls : MonoBehaviour
 {
     // Start is called before the first frame update
     public float speed = 1.0F;
+    bool canJump;
     void Start()
     {
     }
@@ -20,13 +21,29 @@ public class Controls : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) {
             transform.position = transform.position + new Vector3(speed, 0, 0);
         }
-        if (Input.GetKeyDown(KeyCode.W) && canJump()) {
+        if (Input.GetKey(KeyCode.W) && canJump) {
             Debug.Log("pressing W");
             transform.position = transform.position + new Vector3(0, 1F, 0);
         }
     }
 
-    private bool canJump() {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            Vector3 normal = other.GetContact(0).normal;
+            if(normal == Vector3.up){
+                canJump = true;
+            }
+        }
     }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            canJump = false;
+        }
+    }
+    
 }
